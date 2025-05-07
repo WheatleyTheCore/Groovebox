@@ -423,6 +423,9 @@ def audio_to_drum(f, velocity_threshold=30, temperature=1., force_sync=False, st
   return full_drum_audio, full_tap_audio, tap_and_onsets, drums_and_original, combined_drum_sequence
 
 sequence_indices = [1111, 366]
+s = change_tempo(get_tapped_2bar(dev_sequences[1111], velocity=85, ride=True), dev_sequences[1111].tempos[0].qpm)
+download(start_notes_at_0(s), 'file.midi')
+
 for i in sequence_indices:
   s = start_notes_at_0(dev_sequences[i])
   s = change_tempo(get_tapped_2bar(s, velocity=85, ride=True), dev_sequences[i].tempos[0].qpm)
