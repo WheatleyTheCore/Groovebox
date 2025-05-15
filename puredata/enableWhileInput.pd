@@ -1,0 +1,18 @@
+#N canvas 1402 1174 863 419 12;
+#X obj 249 153 timer 1 sec;
+#X obj 247 119 metro 100 1 msec;
+#X msg 332 254 1;
+#X obj 430 60 inlet;
+#X obj 256 199 expr $f1 < $f2;
+#X obj 515 63 inlet;
+#X obj 242 369 outlet;
+#X obj 253 324 change;
+#X connect 0 0 4 0;
+#X connect 1 0 0 1;
+#X connect 2 0 7 0;
+#X connect 3 0 0 0;
+#X connect 3 0 2 0;
+#X connect 4 0 7 0;
+#X connect 5 0 4 1;
+#X connect 7 0 6 0;
+#X connect 7 0 1 0;
