@@ -1,0 +1,8 @@
+librosa==0.11.0
+magenta==2.1.4
+note_seq==0.0.5
+numpy==2.2.5
+simpleaudio==1.0.4
+sounddevice==0.5.1
+tensorflow==2.19.0
+tensorflow_datasets==4.9.8

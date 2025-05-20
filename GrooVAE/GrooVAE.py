@@ -7,10 +7,12 @@ from magenta.models.music_vae.trained_model import TrainedModel
 from magenta.models.music_vae import data
 import note_seq
 from note_seq import midi_synth
+from note_seq.midi_io import midi_to_note_sequence
 from note_seq.sequences_lib import concatenate_sequences
 from note_seq.protobuf import music_pb2
 import sounddevice as sd
 import simpleaudio as sa
+import wave
 
 sd.default.blocksize = 2048 # Increase blocksize/buffer size
 
@@ -50,7 +52,51 @@ def play(note_sequence, sf2_path='Standard_Drum_Kit.sf2'):
     play_obj = sa.play_buffer(audio_data, 1, 2, 44100)
     
     play_obj.wait_done()
+
+def play_data(audio_data):
+  """
+  Play wav file data
+  """    
+  
+  audio_data = np.array(audio_data)
     
+  audio_data *= 32767 / max(abs(audio_data))
+  
+  audio_data = audio_data.astype(np.int16)
+  
+  play_obj = sa.play_buffer(audio_data, 1, 2, 44100)
+  
+  play_obj.wait_done()
+
+def save_seq(note_sequence, filename):
+    note_seq_starting_at_zero = start_notes_at_0(note_sequence)
+    
+    audio_data = note_seq.fluidsynth(note_seq_starting_at_zero, sample_rate=44100)
+    
+    audio_data = np.array(audio_data)
+    
+    audio_data *= 32767 / max(abs(audio_data))
+    
+    audio_data = audio_data.astype(np.int16)
+    
+    with wave.open(filename, "w") as f:
+      # 2 Channels.
+      f.setnchannels(1)
+      # 2 bytes per sample.
+      f.setsampwidth(2)
+      f.setframerate(44100)
+      f.writeframes(audio_data.tobytes())
+      
+def render_seq(note_sequence):
+  """
+  convert sequence to wav data
+  """
+  
+  note_seq_starting_at_zero = start_notes_at_0(note_sequence)
+    
+  audio_data = note_seq.fluidsynth(note_seq_starting_at_zero, sample_rate=44100)
+
+  return audio_data, 44100
     
     # note_seq.plot_sequence(start_notes_at_0(note_sequence))
 
@@ -273,6 +319,31 @@ def audio_tap_to_note_sequence(f, velocity_threshold=30):
 
   return note_sequence
 
+
+def audio_data_tap_to_note_sequence(y, sr, velocity_threshold=30):
+  # pad the beginning to avoid errors with onsets right at the start
+  y = np.concatenate([np.zeros(1000),y])
+  tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+  # try to guess reasonable tempo
+  beat_times = librosa.frames_to_time(beat_frames, sr=sr)
+  onset_frames = librosa.onset.onset_detect(y, sr, units='frames')
+  onset_times = librosa.onset.onset_detect(y, sr, units='time')
+  start_time = onset_times[0]
+  onset_strengths = librosa.onset.onset_strength(y, sr)[onset_frames]
+  normalized_onset_strengths = onset_strengths / np.max(onset_strengths)
+  onset_velocities = np.int32(normalized_onset_strengths * 127)
+  note_sequence = music_pb2.NoteSequence()
+  note_sequence.tempos.add(qpm=tempo)
+  for onset_vel, onset_time in zip(onset_velocities, onset_times):
+    if onset_vel > velocity_threshold and onset_time >= start_time:  # filter quietest notes
+      note_sequence.notes.add(
+        instrument=9, pitch=42, is_drum=True,
+        velocity=onset_vel,  # use fixed velocity here to avoid overfitting
+        start_time=onset_time - start_time,
+        end_time=onset_time - start_time)
+
+  return note_sequence
+
 # Allow encoding of a sequence that has no extracted examples
 # by adding a quiet note after the desired length of time
 def add_silent_note(note_sequence, num_bars):
@@ -422,15 +493,19 @@ def audio_to_drum(f, velocity_threshold=30, temperature=1., force_sync=False, st
   
   return full_drum_audio, full_tap_audio, tap_and_onsets, drums_and_original, combined_drum_sequence
 
-sequence_indices = [1111, 366]
-s = change_tempo(get_tapped_2bar(dev_sequences[1111], velocity=85, ride=True), dev_sequences[1111].tempos[0].qpm)
-download(start_notes_at_0(s), 'file.midi')
+if __name__ == "__main__":
+  sequence_indices = [1111, 366]
+  s = change_tempo(get_tapped_2bar(dev_sequences[1111], velocity=85, ride=True), dev_sequences[1111].tempos[0].qpm)
+  download(start_notes_at_0(s), 'file.midi')
 
-for i in sequence_indices:
-  s = start_notes_at_0(dev_sequences[i])
-  s = change_tempo(get_tapped_2bar(s, velocity=85, ride=True), dev_sequences[i].tempos[0].qpm)
-  print("\nPlaying Tapped Beat: ")
-  play(start_notes_at_0(s))
-  h = change_tempo(drumify(s, groovae_2bar_tap), s.tempos[0].qpm)
-  print("Playing Drummed Beat: ")
-  play(start_notes_at_0(h))
+  for i in sequence_indices:
+    s = start_notes_at_0(dev_sequences[i])
+    s = change_tempo(get_tapped_2bar(s, velocity=85, ride=True), dev_sequences[i].tempos[0].qpm)
+    print("\nPlaying Tapped Beat: ")
+    # play(start_notes_at_0(s))
+    save_seq(s , f'{i}_tapped.wav')
+    h = change_tempo(drumify(s, groovae_2bar_tap), s.tempos[0].qpm)
+    print("Playing Drummed Beat: ")
+    # play(start_notes_at_0(h))
+    save_seq(h , f'{i}_model_output.wav')
+  
