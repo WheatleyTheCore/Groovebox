@@ -1,12 +1,12 @@
 #include <MovingAverageFilter.h>
 
-#define OFFSET_ENERGY_DELTA_THRESH 3
+#define OFFSET_ENERGY_DELTA_THRESH 1
 #define OFFSET_SETTLE_TIME 50 // in cycles
 
 int rawInput;
 float filteredInput;
 float previousValue; // set really big just so whatever initial values are don't trigger an onset
-MovingAverageFilter movingAverageFilter(5);
+MovingAverageFilter movingAverageFilter(3);
 bool bangFlag = true; // wait for it to settle so it doesn't send one on boot
 bool detectedOnset = false; 
 float EMA_a = 0.3;    //initialization of EMA alpha

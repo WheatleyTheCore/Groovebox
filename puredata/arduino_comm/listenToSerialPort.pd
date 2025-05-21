@@ -1,0 +1,14 @@
+#N canvas 1252 266 450 300 12;
+#X msg 207 24 devicename /dev/ttyACM0;
+#X obj 186 113 serial_print;
+#X obj 196 190 list trim;
+#X msg 118 9 devices;
+#X msg 118 51 close;
+#X obj 185 69 comport 0 9600;
+#X obj 196 254 outlet;
+#X connect 0 0 5 0;
+#X connect 1 1 2 0;
+#X connect 2 0 6 0;
+#X connect 3 0 5 0;
+#X connect 4 0 5 0;
+#X connect 5 0 1 0;
