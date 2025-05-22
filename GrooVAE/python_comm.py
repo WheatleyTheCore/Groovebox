@@ -44,10 +44,12 @@ def handleGroovaeMessage(address, *message):
     # GrooVAE.play(GrooVAE.start_notes_at_0(s))
 
     s = GrooVAE.change_tempo(GrooVAE.get_tapped_2bar(s, velocity=100, ride=True), 120)
-    print(s)
-    model_output = GrooVAE.drumify(s, GrooVAE.groovae_2bar_tap)
+    model_output = GrooVAE.change_tempo(GrooVAE.drumify(s, GrooVAE.groovae_2bar_tap), 120)
+    output_with_adjusted_velocity = GrooVAE.recenter_velocities(model_output, 60)
+    print(output_with_adjusted_velocity)
+    
     # GrooVAE.play(GrooVAE.start_notes_at_0(model_output))
-    note_sequence_to_midi_file(model_output, 'output.mid')
+    note_sequence_to_midi_file(output_with_adjusted_velocity, 'output.mid')
     # b = (a[0]**2)
     talk2pd(args.ipIN, args.portOUT, address, os.getcwd() + '/output.mid')
 

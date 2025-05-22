@@ -123,6 +123,15 @@ def change_tempo(note_sequence, new_tempo):
   new_sequence.tempos[0].qpm = new_tempo
   return new_sequence
 
+# center sequence velocity around a value, so you can effectively
+# set the volume of the sequence.
+def recenter_velocities(note_sequence, centerVelocity):
+  new_sequence = copy.deepcopy(note_sequence)
+  for note in new_sequence.notes:
+    note.velocity = min(100, centerVelocity + note.velocity // 3)
+  return new_sequence
+
+
 def download(note_sequence, filename):
   note_seq.sequence_proto_to_midi_file(note_sequence, filename)
   
