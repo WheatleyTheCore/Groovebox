@@ -45,7 +45,7 @@ def handleGroovaeMessage(address, *message):
 
     s = GrooVAE.change_tempo(GrooVAE.get_tapped_2bar(s, velocity=100, ride=True), 120)
     model_output = GrooVAE.change_tempo(GrooVAE.drumify(s, GrooVAE.groovae_2bar_tap), 120)
-    output_with_adjusted_velocity = GrooVAE.recenter_velocities(model_output, 60)
+    output_with_adjusted_velocity = GrooVAE.recenter_velocities(model_output, 40)
     print(output_with_adjusted_velocity)
     
     # GrooVAE.play(GrooVAE.start_notes_at_0(model_output))
