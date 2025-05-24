@@ -1,14 +1,14 @@
 #include <MovingAverageFilter.h>
 #include <ADCTouch.h>
 
-#define OFFSET_ENERGY_DELTA_THRESH 0.3
-#define OFFSET_SETTLE_TIME 40 // in ms
+#define OFFSET_ENERGY_DELTA_THRESH 0.8
+#define OFFSET_SETTLE_TIME 20 // in ms
 
 int rawPiezoInput;
 float filteredPizeoInput;
 float previousPiezoInput; // set really big just so whatever initial values are don't trigger an onset
 
-MovingAverageFilter pizeoFilter(10);
+MovingAverageFilter pizeoFilter(8);
 MovingAverageFilter pressureFilter(20);
 
 bool onsetFlag = true; // wait for it to settle so it doesn't send one on boot
@@ -45,7 +45,7 @@ void setup() {
   EMA_S = analogRead(A0);     //set EMA S for t=1
   capacitiveTouchRef = ADCTouch.read(A1);
   previousPiezoInput = EMA_S;
-  Serial.print("time (ms)");
+  Serial.print("time");
   Serial.print(',');
   Serial.print("onset_detection");
   Serial.print(',');
