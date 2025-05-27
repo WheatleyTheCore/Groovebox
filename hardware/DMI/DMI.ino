@@ -45,18 +45,18 @@ void setup() {
   EMA_S = analogRead(A0);     //set EMA S for t=1
   capacitiveTouchRef = ADCTouch.read(A1);
   previousPiezoInput = EMA_S;
-  Serial.print("time");
-  Serial.print(',');
-  Serial.print("onset_detection");
-  Serial.print(',');
-  Serial.println("capacitive_detection");
+//  Serial.print("time");
+//  Serial.print(',');
+//  Serial.print("onset_detection");
+//  Serial.print(',');
+//  Serial.println("capacitive_detection");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   rawPiezoInput = analogRead(A0);  // read the input pin
   raw_avg_pressure = (analogRead(A2) + analogRead(A3) + analogRead(A4) + analogRead(A5)) / 4;
-  filtered_avg_pressure = pressureFilter.process(raw_avg_pressure) - 600; // evil magic number, quick band-aid to make pressure settle around 0
+  filtered_avg_pressure = pressureFilter.process(raw_avg_pressure) - 440; // evil magic number, quick band-aid to make pressure settle around 0
   EMA_S = (EMA_a*rawPiezoInput) + ((1-EMA_a)*EMA_S);
   highpassValue = constrain(rawPiezoInput - EMA_S, 0, 100); 
   filteredPizeoInput = pizeoFilter.process(highpassValue);
@@ -68,8 +68,6 @@ void loop() {
   capacitiveTouchVal -= capacitiveTouchRef;
   isCapacitiveTouch = capacitiveTouchVal > 40;
 
-  Serial.print(millis());
-  Serial.print(',');
   
   if (detectedOnset && !onsetFlag && filtered_avg_pressure < 100) {
     onsetFlag = true;
@@ -79,17 +77,17 @@ void loop() {
     Serial.print(false);
   }
 
+  Serial.print(' ');
   
-  
-//  Serial.println(filteredPizeoInput);
-  Serial.print(',');
-  if (isCapacitiveTouch && !previousCapacitiveTouch) {
-    Serial.println(true); 
-  } else {
-    Serial.println(false); 
-  }
-
-  previousCapacitiveTouch = isCapacitiveTouch;
+  Serial.println(filtered_avg_pressure);
+//  Serial.print(',');
+//  if (isCapacitiveTouch && !previousCapacitiveTouch) {
+//    Serial.println(true); 
+//  } else {
+//    Serial.println(false); 
+//  }
+//
+//  previousCapacitiveTouch = isCapacitiveTouch;
 
 
   if (!detectedOnset && onsetFlag) {
