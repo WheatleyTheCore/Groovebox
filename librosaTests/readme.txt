@@ -1,0 +1,1 @@
+This folder's main purpose is to test the onset detection in librosa.
