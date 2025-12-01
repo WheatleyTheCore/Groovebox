@@ -1,4 +1,4 @@
-#include <MovingAverageFilter.h>
+include <MovingAverageFilter.h>
 #include <ADCTouch.h>
 
 #define OFFSET_ENERGY_DELTA_THRESH 0.8
