@@ -239,9 +239,10 @@ GROOVAE_2BAR_HITS_CONTROL = "groovae_2bar_hits_control.tar"
 GROOVAE_2BAR_TAP_FIXED_VELOCITY = "groovae_2bar_tap_fixed_velocity.tar"
 GROOVAE_2BAR_ADD_CLOSED_HH = "groovae_2bar_add_closed_hh.tar"
 GROOVAE_2BAR_HITS_CONTROL_NOKL = "groovae_2bar_hits_control_nokl.tar"
+GROOVAE_2BAR_CUSTOM = "custom_trained.tar"
 
 config_2bar_tap = configs.CONFIG_MAP['groovae_2bar_tap_fixed_velocity']
-groovae_2bar_tap = TrainedModel(config_2bar_tap, 1, checkpoint_dir_or_path=GROOVAE_2BAR_TAP_FIXED_VELOCITY)
+groovae_2bar_tap = TrainedModel(config_2bar_tap, 1, checkpoint_dir_or_path=GROOVAE_2BAR_CUSTOM)
 
 def mix_tracks(y1, y2, stereo = False):
   l = max(len(y1),len(y2))
