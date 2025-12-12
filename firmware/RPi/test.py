@@ -58,7 +58,7 @@ onsetFlag = -1 #-1 when no onset is happening, 0-3 when an onset is happening
 prevEvent = 0
 piezoInputs = [0]*3
 #piezoInputsRaw = [0]*3
-MIN_VAL_FOR_ONSET = 100
+MIN_VAL_FOR_ONSET = 300
 piezoActivatedThisOnset = [0]*3
 
 while (True):
@@ -106,4 +106,6 @@ while (True):
         onsetFlag = -1
         piezoActivatedThisOnset = [0]*3
         prevEvent = time.time_ns()
+    
+    print(piezoInputs)
 

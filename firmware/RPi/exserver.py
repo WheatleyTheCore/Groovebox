@@ -84,15 +84,13 @@ socket2.send_string("-1")
 
 #get tempo from first 4 taps, average the ioi
 tapTimes = [0]*4
-i = 0
-while (i < 4):
+while (averageIOI == 0):
     message = socket.recv()
     if (message != b"correction 3"): #ignore 3 corrections
         #tapTimes[i] = time.time()
         handleThree(time.time())
         socket.send(b"gotcha")
         print("bom")
-        i += 1
     else:
         socket.send(b"don't talk to me with those correction messages right now")
 
@@ -100,6 +98,7 @@ while (i < 4):
 #averageIOI = sum(intervals) / 3
 #bpm = (1 / averageIOI) * 60
 #print(f"bpm: {bpm}")
+print(f"ioi {averageIOI}, time {time.time()}, last three {lastThree}")
 time.sleep(averageIOI - (time.time() - lastThree))
 #if anything came in during that sleep, silence it
 if (socket.poll(1, zmq.POLLIN)):
